@@ -27,6 +27,12 @@ const taskOfferSchema = new mongoose.Schema({
   category: {
     type: String,
   },
+  primaryLink: {
+    type: String,
+  },
+  secondaryLink: {
+    type: String,
+  },
 });
 
 const TaskOffer = mongoose.model('TaskOffer', taskOfferSchema);

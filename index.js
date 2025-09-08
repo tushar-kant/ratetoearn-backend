@@ -6,18 +6,14 @@ const app = express();
 const port = 3000;
 
 const connectDB = require('./db');
-const mongoose = require('mongoose');
-const User = require('./models/User');
 const authController = require('./controllers/authController');
 const withdrawalController = require('./controllers/withdrawalController');
-const Earning = require('./models/Earning');
-const Withdrawal = require('./models/Withdrawal');
+
 const earningController = require('./controllers/earningController');
 const appOfferController = require('./controllers/appOfferController');
 const taskOfferController = require('./controllers/taskOfferController');
 const reviewOfferController = require('./controllers/reviewOfferController');
 const checkinController = require('./controllers/checkinController');
-const { authMiddleware } = require('./controllers/authController');
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -53,6 +49,7 @@ async function startServer() {
 
     app.post('/withdraw', withdrawalController.createWithdrawal);
     app.put('/withdraw/:id', withdrawalController.updateWithdrawalState);
+    app.post('/getWithdrawals', withdrawalController.getWithdrawalStatus);
 
     app.listen(port, () => {
       console.log(`Example app listening on port ${port}`);

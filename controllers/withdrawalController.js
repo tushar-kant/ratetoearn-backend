@@ -28,6 +28,19 @@ const withdrawalController = {
 
       await withdrawal.save();
 
+      const userEarning = await Earning.findOne({ phone: phoneNumber });
+
+      if (!userEarning) {
+        return res.status(404).json({ message: "Earning not found for this user" });
+      }
+
+      if (userEarning.availableNow < amount) {
+        return res.status(400).json({ message: "Insufficient balance" });
+      }
+
+      userEarning.availableNow -= amount;
+      await userEarning.save();
+
       // Respond to the client
       res.status(201).json({ message: "Withdrawal request created successfully", withdrawal });
     } catch (error) {
@@ -84,11 +97,39 @@ const withdrawalController = {
         earning.availableNow -= withdrawal.amount;
         earning.totalWithdrawn += withdrawal.amount;
         await earning.save();
-      }
 
-      res.status(200).json({ message: "Withdrawal state updated successfully", withdrawal });
+        res.status(200).json({ message: "Withdrawal state updated successfully", withdrawal });
+      } else {
+        res.status(200).json({ message: "Withdrawal state updated successfully", withdrawal });
+      }
     } catch (error) {
       console.error("Error updating withdrawal state:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  getWithdrawalStatus: async (req, res) => {
+    try {
+      const { phoneNumber } = req.body;
+
+      if (!phoneNumber) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
+
+      const withdrawals = await Withdrawal.find({ phoneNumber });
+
+      if (!withdrawals || withdrawals.length === 0) {
+        return res.status(404).json({ message: "No withdrawals found for this phone number" });
+      }
+
+      res.status(200).json(withdrawals.map(withdrawal => ({
+        amount: withdrawal.amount,
+        phoneNumber: withdrawal.phoneNumber,
+        type: withdrawal.type,
+        status: withdrawal.state
+      })));
+    } catch (error) {
+      console.error("Error getting withdrawal status:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   },

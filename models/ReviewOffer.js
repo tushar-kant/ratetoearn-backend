@@ -30,6 +30,12 @@ const reviewOfferSchema = new mongoose.Schema({
   category: {
     type: String,
   },
+  primaryLink: {
+    type: String,
+  },
+  secondaryLink: {
+    type: String,
+  },
 });
 
 const ReviewOffer = mongoose.model('ReviewOffer', reviewOfferSchema);

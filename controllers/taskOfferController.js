@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const TaskOffer = require('../models/TaskOffer');
+const { checkPhoneNumber } = require('../middleware');
 
 // Get all task offers
-exports.getTaskOffer = async (req, res) => {
+exports.getTaskOffer = [checkPhoneNumber, async (req, res) => {
   try {
     const taskOffers = await TaskOffer.find();
     res.status(200).json(taskOffers);
@@ -10,22 +11,37 @@ exports.getTaskOffer = async (req, res) => {
     console.error('Error fetching task offers:', error);
     res.status(500).json({ message: 'Error fetching task offers' });
   }
-};
+}];
 
 // Add a new task offer
-exports.addTaskOffer = async (req, res) => {
+exports.addTaskOffer = [checkPhoneNumber, async (req, res) => {
   try {
-    const taskOffer = new TaskOffer(req.body);
+    const { primaryLink, secondaryLink, ...rest } = req.body;
+    const taskOffer = new TaskOffer({ ...rest, primaryLink, secondaryLink });
     await taskOffer.save();
     res.status(201).json({ message: 'Task offer added successfully', taskOffer });
   } catch (error) {
     console.error('Error adding task offer:', error);
     res.status(500).json({ message: 'Error adding task offer' });
   }
-};
+}];
+
+function applyFallback(link) {
+  if (!link) return link;
+
+  let newLink = link;
+  if (link.includes("google.com")) {
+    newLink = "google.com";
+  } else if (link.includes("youtube.com")) {
+    newLink = "youtube.com";
+  } else if (link.includes("playstore.com")) {
+    newLink = "playstore.com";
+  }
+  return newLink;
+}
 
 // Get details of a specific task offer by ID
-exports.getTaskOfferDetails = async (req, res) => {
+exports.getTaskOfferDetails = [checkPhoneNumber, async (req, res) => {
   try {
     const { id } = req.body;
     const taskOffer = await TaskOffer.findById(id);
@@ -57,7 +73,9 @@ exports.getTaskOfferDetails = async (req, res) => {
     const taskOfferWithAllFields = {
       ...taskOfferWithBreakdown,
       instructions: instructions,
-      badges: badges
+      badges: badges,
+      primaryLink: applyFallback(taskOffer.primaryLink),
+      secondaryLink: applyFallback(taskOffer.secondaryLink)
     };
 
     res.status(200).json(taskOfferWithAllFields);
@@ -65,4 +83,4 @@ exports.getTaskOfferDetails = async (req, res) => {
     console.error('Error fetching task offer details:', error);
     res.status(500).json({ message: 'Error fetching task offer details' });
   }
-};
+}];

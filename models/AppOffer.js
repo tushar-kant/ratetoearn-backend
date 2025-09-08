@@ -39,6 +39,12 @@ const appOfferSchema = new mongoose.Schema({
   completions: {
     type: Number,
   },
+  primaryLink: {
+    type: String,
+  },
+  secondaryLink: {
+    type: String,
+  },
 });
 
 const AppOffer = mongoose.model('AppOffer', appOfferSchema);

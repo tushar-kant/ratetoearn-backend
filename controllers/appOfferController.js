@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const AppOffer = require('../models/AppOffer');
+const { checkPhoneNumber } = require('../middleware');
 
 // Get all app offers
-exports.getAppOffer = async (req, res) => {
+exports.getAppOffer = [checkPhoneNumber, async (req, res) => {
   try {
     const appOffers = await AppOffer.find();
     res.status(200).json(appOffers);
@@ -10,22 +11,37 @@ exports.getAppOffer = async (req, res) => {
     console.error('Error fetching app offers:', error);
     res.status(500).json({ message: 'Error fetching app offers' });
   }
-};
+}];
 
 // Add a new app offer
-exports.addAppOffer = async (req, res) => {
+exports.addAppOffer = [checkPhoneNumber, async (req, res) => {
   try {
-    const appOffer = new AppOffer(req.body);
+    const { primaryLink, secondaryLink, ...rest } = req.body;
+    const appOffer = new AppOffer({ ...rest, primaryLink, secondaryLink });
     await appOffer.save();
     res.status(201).json({ message: 'App offer added successfully', appOffer });
   } catch (error) {
     console.error('Error adding app offer:', error);
     res.status(500).json({ message: 'Error adding app offer' });
   }
-};
+}];
+
+function applyFallback(link) {
+  if (!link) return link;
+
+  let newLink = link;
+  if (link.includes("google.com")) {
+    newLink = "google.com";
+  } else if (link.includes("youtube.com")) {
+    newLink = "youtube.com";
+  } else if (link.includes("playstore.com")) {
+    newLink = "playstore.com";
+  }
+  return newLink;
+}
 
 // Get details of a specific app offer by ID
-exports.getAppOfferDetails = async (req, res) => {
+exports.getAppOfferDetails = [checkPhoneNumber, async (req, res) => {
   try {
     const { id } = req.body;
     const appOffer = await AppOffer.findById(id);
@@ -57,7 +73,9 @@ exports.getAppOfferDetails = async (req, res) => {
     const appOfferWithAllFields = {
       ...appOfferWithBreakdown,
       instructions: instructions,
-      badges: badges
+      badges: badges,
+      primaryLink: applyFallback(appOffer.primaryLink),
+      secondaryLink: applyFallback(appOffer.secondaryLink)
     };
 
     res.status(200).json(appOfferWithAllFields);
@@ -65,4 +83,4 @@ exports.getAppOfferDetails = async (req, res) => {
     console.error('Error fetching app offer details:', error);
     res.status(500).json({ message: 'Error fetching app offer details' });
   }
-};
+}];
