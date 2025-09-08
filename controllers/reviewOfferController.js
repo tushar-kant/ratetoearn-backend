@@ -16,8 +16,7 @@ exports.getReview = [checkPhoneNumber, async (req, res) => {
 // Add a new review offer
 exports.addReview = [checkPhoneNumber, async (req, res) => {
   try {
-    const { primaryLink, secondaryLink, ...rest } = req.body;
-    const reviewOffer = new ReviewOffer({ ...rest, primaryLink, secondaryLink });
+    const reviewOffer = new ReviewOffer(req.body);
     await reviewOffer.save();
     res.status(201).json({ message: 'Review offer added successfully', reviewOffer });
   } catch (error) {
@@ -45,42 +44,27 @@ exports.getReviewDetails = [checkPhoneNumber, async (req, res) => {
   try {
     const { id } = req.body;
     const reviewOffer = await ReviewOffer.findById(id);
-
     if (!reviewOffer) {
       return res.status(404).json({ message: 'Review offer not found' });
     }
-
-    // Ensure breakdown is always present with default values
-    const breakdown = reviewOffer.breakdown || {
-      installation: { value: '', icon: '', color: '' },
-      usage: { value: '', icon: '', color: '' },
-      retention: { value: '', icon: '', color: '' }
-    };
-
-    const reviewOfferWithBreakdown = {
-      ...reviewOffer.toObject(),
-      breakdown: {
-        installation: { ...(breakdown.installation || { value: '', icon: '', color: '' }) },
-        usage: { ...(breakdown.usage || { value: '', icon: '', color: '' }) },
-        retention: { ...(breakdown.retention || { value: '', icon: '', color: '' }) }
-      }
-    };
-
-    // Ensure instructions and badges are always present
-    const instructions = reviewOffer.instructions || [];
-    const badges = reviewOffer.badges || [];
-
-    const reviewOfferWithAllFields = {
-      ...reviewOfferWithBreakdown,
-      instructions: instructions,
-      badges: badges,
-      primaryLink: applyFallback(reviewOffer.primaryLink),
-      secondaryLink: applyFallback(reviewOffer.secondaryLink)
-    };
-
-    res.status(200).json(reviewOfferWithAllFields);
+    res.status(200).json(reviewOffer);
   } catch (error) {
     console.error('Error fetching review offer details:', error);
     res.status(500).json({ message: 'Error fetching review offer details' });
+  }
+}];
+
+// Delete a review offer
+exports.deleteReviewOffer = [checkPhoneNumber, async (req, res) => {
+  try {
+    const { id } = req.body;
+    const reviewOffer = await ReviewOffer.findByIdAndDelete(id);
+    if (!reviewOffer) {
+      return res.status(404).json({ message: 'Review offer not found' });
+    }
+    res.status(200).json({ message: 'Review offer deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting review offer:', error);
+    res.status(500).json({ message: 'Error deleting review offer' });
   }
 }];

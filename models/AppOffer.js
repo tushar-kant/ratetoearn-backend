@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const appOfferSchema = new mongoose.Schema({
+  type: {
+    type: String,
+  },
   name: {
     type: String,
     required: true,
@@ -24,20 +27,19 @@ const appOfferSchema = new mongoose.Schema({
   timeRequired: {
     type: String,
   },
-  shortDesc: {
-    type: String,
-  },
   instructions: {
-    type: Array,
-  },
-  breakdown: {
-    type: Object,
+    type: [String],
+    default: [],
   },
   badges: {
-    type: Array,
+    type: [String],
+    default: [],
   },
-  completions: {
+  reviews: {
     type: Number,
+  },
+  timeEstimate: {
+    type: String,
   },
   primaryLink: {
     type: String,

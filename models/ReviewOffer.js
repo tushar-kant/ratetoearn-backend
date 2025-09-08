@@ -36,6 +36,17 @@ const reviewOfferSchema = new mongoose.Schema({
   secondaryLink: {
     type: String,
   },
+  instructions: {
+    type: [String],
+    default: [],
+  },
+  badges: {
+    type: [String],
+    default: [],
+  },
+  timeRequired: {
+    type: String,
+  },
 });
 
 const ReviewOffer = mongoose.model('ReviewOffer', reviewOfferSchema);

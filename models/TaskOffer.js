@@ -33,6 +33,20 @@ const taskOfferSchema = new mongoose.Schema({
   secondaryLink: {
     type: String,
   },
+  instructions: {
+    type: [String],
+    default: [],
+  },
+  badges: {
+    type: [String],
+    default: [],
+  },
+  reviews: {
+    type: Number,
+  },
+  timeRequired: {
+    type: String,
+  },
 });
 
 const TaskOffer = mongoose.model('TaskOffer', taskOfferSchema);
