@@ -47,6 +47,15 @@ const taskOfferSchema = new mongoose.Schema({
   timeRequired: {
     type: String,
   },
+
+  completedBy: {
+    type: [String],
+    default: [],
+  },
+  pendingBy: {
+    type: [String],
+    default: [],
+  },
 });
 
 const TaskOffer = mongoose.model('TaskOffer', taskOfferSchema);

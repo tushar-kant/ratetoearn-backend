@@ -39,18 +39,30 @@ async function startServer() {
     app.post('/appOffers', appOfferController.addAppOffer);
     app.post('/appOffersDetails', appOfferController.getAppOfferDetails);
     app.post('/appOffers/delete', appOfferController.deleteAppOffer);
+    app.post('/appOffers/reviewComplete', appOfferController.reviewCompleteOffer);
+    app.post('/appOffers/approveComplete', appOfferController.approveCompleteOffer);
+    app.post('/appOffers/complete', appOfferController.completeAppOffer);
 
     app.get('/taskOffers', taskOfferController.getTaskOffer);
     app.post('/taskOffers', taskOfferController.addTaskOffer);
     app.post('/taskOffersDetails', taskOfferController.getTaskOfferDetails);
     app.post('/taskOffers/delete', taskOfferController.deleteTaskOffer);
-
+    app.post('/taskOffers/reviewComplete', taskOfferController.reviewCompleteOffer);
+    app.post('/taskOffers/approveComplete', taskOfferController.approveCompleteOffer);
+    app.post('/taskOffers/complete', taskOfferController.completeTaskOffer);
     app.get('/reviewOffers', reviewOfferController.getReview);
+
+
     app.post('/reviewOffers', reviewOfferController.addReview);
     app.post('/reviewOffersDetails', reviewOfferController.getReviewDetails);
     app.post('/reviewOffers/delete', reviewOfferController.deleteReviewOffer);
+    app.post('/reviewOffers/reviewComplete', reviewOfferController.reviewCompleteOffer);
+    app.post('/reviewOffers/approveComplete', reviewOfferController.approveCompleteOffer);
+    app.post('/reviewOffers/complete', reviewOfferController.completeReviewOffer);
 
-    app.post('/checkin',  checkinController.dailyCheckin);
+
+
+    app.post('/checkin', checkinController.dailyCheckin);
 
     app.post('/withdraw', withdrawalController.createWithdrawal);
     app.put('/withdraw/:id', withdrawalController.updateWithdrawalState);

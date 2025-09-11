@@ -47,6 +47,14 @@ const reviewOfferSchema = new mongoose.Schema({
   timeRequired: {
     type: String,
   },
+  completedBy: {
+    type: [String],
+    default: [],
+  },
+  pendingBy: {
+    type: [String],
+    default: [],
+  },
 });
 
 const ReviewOffer = mongoose.model('ReviewOffer', reviewOfferSchema);

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const TaskOffer = require('../models/TaskOffer');
 const { checkPhoneNumber } = require('../middleware');
+const PendingOffer = require('../models/PendingOffer');
 
 // Get all task offers
 exports.getTaskOffer = [checkPhoneNumber, async (req, res) => {
@@ -67,4 +68,95 @@ exports.deleteTaskOffer = [checkPhoneNumber, async (req, res) => {
     console.error('Error deleting task offer:', error);
     res.status(500).json({ message: 'Error deleting task offer' });
   }
+}];
+
+// Review complete offer and change status to pending
+exports.reviewCompleteOffer = [checkPhoneNumber, async (req, res) => {
+  try {
+    const { taskId, phone } = req.body;
+
+    // Find the task offer by ID
+    const taskOffer = await TaskOffer.findById(taskId);
+    if (!taskOffer) {
+      return res.status(404).json({ message: 'Task offer not found' });
+    }
+
+    // Check if a PendingOffer already exists
+    const existingPendingOffer = await PendingOffer.findOne({ offerId: taskId, phone: phone, offerType: 'task' });
+    if (existingPendingOffer) {
+      return res.status(400).json({ message: 'Pending offer already exists for this user and task' });
+    }
+
+    // Create a new PendingOffer
+    const pendingOffer = new PendingOffer({
+      offerId: taskId,
+      phone: phone,
+      offerType: 'task',
+    });
+    await pendingOffer.save();
+
+    res.status(200).json({ message: 'Task offer review requested', pendingOffer });
+  } catch (error) {
+    console.error('Error reviewing task offer:', error);
+    res.status(500).json({ message: 'Error reviewing task offer' });
+  }
+}];
+
+// Approve complete offer, grant coins to the user, and set as complete
+exports.approveCompleteOffer = [checkPhoneNumber, async (req, res) => {
+  try {
+    const { taskId, phone } = req.body;
+
+    // Find the task offer by ID
+    const taskOffer = await TaskOffer.findById(taskId);
+    if (!taskOffer) {
+      return res.status(404).json({ message: 'Task offer not found' });
+    }
+
+  
+
+    // Check if the user has already completed the task
+    if (taskOffer.completedBy.includes(phone)) {
+      return res.status(400).json({ message: 'User has already completed this task' });
+    }
+
+    // Find and delete the PendingOffer
+    const pendingOffer = await PendingOffer.findOneAndDelete({ offerId: taskId, phone: phone, offerType: 'task' });
+    if (!pendingOffer) {
+      return res.status(404).json({ message: 'Pending offer not found' });
+    }
+
+    // Add the user's phone to the completedBy array
+    taskOffer.completedBy.push(phone);
+    taskOffer.status = 'completed';
+    await taskOffer.save();
+
+    // Find the user by phone number
+    const User = require('../models/User'); // Import the User model
+    const user = await User.findOne({ phone: phone });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Grant the user coins based on the task offer's earning field
+    user.coins += taskOffer.earning;
+    await user.save();
+
+    // Update or create Earning document
+    const Earning = require('../models/Earning');
+    const earning = await Earning.findOneAndUpdate(
+      { phone: phone },
+      { $inc: { availableNow: taskOffer.earning, totalEarning: taskOffer.earning } },
+      { upsert: true, new: true }
+    );
+
+    res.status(200).json({ message: 'Task offer completed successfully, and coins granted to user', taskOffer, user, earning });
+  } catch (error) {
+    res.status(500).json({ message: 'Error completing task offer' });
+  }
+}];
+
+// Complete a task offer
+exports.completeTaskOffer = [checkPhoneNumber, async (req, res) => {
+  res.status(200).json({ message: 'Task offer review completed successfully' });
 }];

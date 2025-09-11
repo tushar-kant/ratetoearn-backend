@@ -47,6 +47,14 @@ const appOfferSchema = new mongoose.Schema({
   secondaryLink: {
     type: String,
   },
+  completedBy: {
+    type: [String],
+    default: [],
+  },
+  pendingBy: {
+    type: [String],
+    default: [],
+  },
 });
 
 const AppOffer = mongoose.model('AppOffer', appOfferSchema);
