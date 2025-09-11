@@ -26,6 +26,10 @@ userSchema.add({
   coins: {
     type: Number,
     default: 0,
+  },
+  settings: {
+    type: Object,
+    default: {}
   }
 });
 

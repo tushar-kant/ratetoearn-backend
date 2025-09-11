@@ -33,6 +33,9 @@ async function startServer() {
     app.post('/register', authController.register);
     app.post('/login', authController.login);
 
+    const { updateSettings, getSettingsByPhone } = require('./controllers/settingsController');
+    app.post('/settings', updateSettings);
+
     app.post('/earning', earningController.getEarning);
 
     app.get('/appOffers', appOfferController.getAppOffer);
@@ -67,6 +70,8 @@ async function startServer() {
     app.post('/withdraw', withdrawalController.createWithdrawal);
     app.put('/withdraw/:id', withdrawalController.updateWithdrawalState);
     app.post('/getWithdrawals', withdrawalController.getWithdrawalStatus);
+
+    app.post('/getSettings', getSettingsByPhone);
 
     app.listen(port, () => {
       console.log(`Example app listening on port ${port}`);
