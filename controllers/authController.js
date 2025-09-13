@@ -40,14 +40,15 @@ exports.register = async (req, res) => {
         // Add 10 points to the referrer's earning
         const referrerEarning = await Earning.findOne({ phone: referrer.phone });
         if (referrerEarning) {
-          referrerEarning.referralEarning += 10;
-          referrerEarning.totalEarning += 10;
+          referrerEarning.referralEarning += 25;
+          referrerEarning.totalEarning += 25;
           referrerEarning.availableNow = referrerEarning.totalEarning - referrerEarning.totalWithdrawn;
           await referrerEarning.save();
         }
 
         // Add 10 points to the new user's earning
-        earning.totalEarning += 10;
+        earning.totalEarning += 25;
+        earning.referralEarning += 25;
         earning.availableNow = earning.totalEarning - earning.totalWithdrawn;
         await earning.save();
       }

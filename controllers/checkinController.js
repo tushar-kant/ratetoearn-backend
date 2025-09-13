@@ -40,7 +40,7 @@ exports.dailyCheckin = async (req, res) => {
     }
 
     // Update user
-    user.coins += 1;
+    user.coins += 2;
     user.lastCheckin = nowInSeconds; // ✅ store as seconds (number)
 
     console.log(`Before save: user.lastCheckin = ${user.lastCheckin}`);
@@ -52,8 +52,8 @@ exports.dailyCheckin = async (req, res) => {
     // Update earning
     const earning = await Earning.findOne({ phone });
     if (earning) {
-      earning.checkinEarning += 1;
-      earning.totalEarning += 1;
+      earning.checkinEarning += 2;
+      earning.totalEarning += 2;
       earning.availableNow = earning.totalEarning - earning.totalWithdrawn;
       await earning.save();
     }
