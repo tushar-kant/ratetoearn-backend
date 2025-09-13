@@ -59,3 +59,33 @@ exports.dailyCheckin = async (req, res) => {
     checkinLocks.delete(phone); // Release lock
   }
 };
+
+exports.adsCheckin = async (req, res) => {
+  try {
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ message: "Phone number is required" });
+    }
+
+    const user = await User.findOne({ phone });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    let earning = await Earning.findOne({ phone });
+    if (earning) {
+      earning.adsEarning += 1;
+      earning.totalEarning += 1;
+      earning.availableNow = earning.totalEarning - earning.totalWithdrawn;
+      await earning.save();
+    }
+ 
+    res.status(200).json({ message: 'Ads check-in successful.', earning });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

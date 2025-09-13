@@ -18,6 +18,10 @@ const earningSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  adsEarning: {
+    type: Number,
+    default: 0,
+  },
   referralEarning: {
     type: Number,
     default: 0,

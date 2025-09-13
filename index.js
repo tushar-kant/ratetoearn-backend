@@ -16,7 +16,12 @@ const taskOfferController = require('./controllers/taskOfferController');
 const reviewOfferController = require('./controllers/reviewOfferController');
 const checkinController = require('./controllers/checkinController');
 
+const router = express.Router();
+// Check-in routes
+router.post('/adscheckin', checkinController.adsCheckin);
+
 app.use(express.json());
+app.use(router);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
