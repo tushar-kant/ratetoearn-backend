@@ -14,15 +14,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
+    lastCheckin: {
+    type: Number,
+    default: null,
+  },
 });
 
 const User = mongoose.model('User', userSchema);
 
 userSchema.add({
-  lastCheckin: {
-    type: Date,
-    default: null,
-  },
+
   coins: {
     type: Number,
     default: 0,
